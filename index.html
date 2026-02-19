@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNAO INVESTMENTS - Admin & Live Feed</title>
+    <link rel="icon" href="https://drive.google.com/uc?export=view&id=1dvFE4ncghor7CdvN41csWZbWFClWZXBQ">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #030b17;
+            --card-bg: #0d1b2e;
+            --accent-orange: #ff6b35;
+            --accent-yellow: #f7c948;
+            --text-white: #ffffff;
+            --text-gray: #8b9bb4;
+            --gradient: linear-gradient(90deg, #ff7e21, #f9a825);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-white); padding-bottom: 80px; }
+
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--bg-color); }
+        .logo { font-size: 1.4rem; font-weight: 800; cursor: pointer;}
+        .logo span { color: #00d2ff; }
+        .menu-btn { font-size: 1.5rem; color: var(--text-gray); cursor: pointer; }
+
+        /* Hero */
+        .hero { background: var(--gradient); margin: 15px; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(255, 126, 33, 0.3); }
+        .hero h2 { margin-bottom: 10px; font-size: 1.5rem; }
+        .hero p { font-size: 0.9rem; margin-bottom: 20px; opacity: 0.9; }
+        .hero-btns { display: flex; gap: 10px; }
+        .btn { border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; flex: 1; text-align: center; }
+        .btn-white { background: white; color: var(--accent-orange); }
+        .btn-outline { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); }
+
+        /* Networks */
+        .section-title { margin: 20px 15px 15px; font-size: 1.1rem; font-weight: 700; }
+        .network-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 0 15px 25px; }
+        .net-card { background: var(--card-bg); padding: 15px 10px; border-radius: 15px; text-align: center; border: 1px solid #1c3652; cursor: pointer; }
+        .net-logo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; background: white; border: 2px solid #1c3652; }
+        .net-name { font-weight: 600; font-size: 0.9rem; }
+
+        /* Live Feed */
+        .transaction-list { margin: 0 15px; }
+        .transaction-item { background: var(--card-bg); padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px solid #1c3652; position: relative; }
+        .t-row { display: flex; align-items: center; width: 100%; }
+        .t-logo { width: 40px; height: 40px; border-radius: 50%; margin-right: 12px; background: white; border: 1px solid #1c3652; padding: 2px; }
+        .t-details { flex: 1; }
+        .t-number { font-weight: 600; font-size: 0.95rem; }
+        .t-status-label { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px; text-transform: uppercase; }
+        .status-pending { background: rgba(255, 165, 0, 0.2); color: orange; }
+        .status-completed { background: rgba(0, 200, 83, 0.2); color: #00c853; }
+        .t-gb { color: #00d2ff; font-weight: bold; font-size: 1.1rem; }
+
+        /* Admin Controls */
+        .admin-controls { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #1c3652; }
+        .admin-btn { flex: 1; padding: 8px; border-radius: 6px; border: none; font-size: 0.75rem; font-weight: bold; cursor: pointer; color: white; }
+        .btn-p { background: orange; }
+        .btn-c { background: green; }
+        .btn-d { background: #e60000; }
+
+        /* Admin Modal */
+        #adminPanel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; padding: 20px; overflow-y: auto; }
+        .admin-box { background: var(--card-bg); padding: 25px; border-radius: 15px; max-width: 400px; margin: 50px auto; border: 1px solid #1c3652; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: var(--text-gray); font-size: 0.9rem; }
+        .form-group input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #050a14; color: white; }
+        .btn-submit { width: 100%; background: var(--accent-orange); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .close-admin { position: absolute; top: 20px; right: 20px; font-size: 2rem; color: white; cursor: pointer; }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--bg-color); border-top: 1px solid #1c3652; display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-gray); font-size: 0.75rem; text-decoration: none; cursor: pointer; }
+        .nav-item.active { color: #00d2ff; }
+        .nav-item i { font-size: 1.3rem; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo" onclick="window.location.reload()">FNAO <span>INVESTMENTS</span></div>
+        <div class="menu-btn" onclick="toggleAdmin()"><i class="fas fa-bars"></i></div>
+    </div>
+
+    <div class="hero">
+        <h2>Akwaaba, Chief! 👋</h2>
+        <p>Your instant data plug. 24/7 reliability.</p>
+        <div class="hero-btns">
+            <button class="btn btn-white" onclick="window.location.href='buy.html'">Buy Data</button>
+            <button class="btn btn-outline">Support</button>
+        </div>
+    </div>
+
+    <div class="section-title">Choose Network</div>
+    <div class="network-grid">
+        <div class="net-card" onclick="window.location.href='buy.html'">
+            <img src="https://i.ibb.co/27Q5C3v1/New-mtn-logo.jpg" class="net-logo" alt="MTN">
+            <div class="net-name">MTN</div>
+        </div>
+        <div class="net-card" onclick="window.location.href='buy.html'">
+            <img src="https://i.ibb.co/wN8Nmqcx/images.png" class="net-logo" alt="Telecel">
+            <div class="net-name">Telecel</div>
+        </div>
+        <div class="net-card" onclick="window.location.href='buy.html'">
+            <img src="https://i.ibb.co/mCCL0s4n/Airtel-logo-01.png" class="net-logo" alt="AT">
+            <div class="net-name">AT</div>
+        </div>
+    </div>
+
+    <div class="section-title" id="orders-view">Recent Transactions <span id="admin-badge" style="display:none; color:lime; font-size:0.7rem;">(ADMIN MODE)</span></div>
+    <div class="transaction-list" id="transactionFeed">
+        <div style="text-align:center; padding:40px; color:gray;">Connecting to feed...</div>
+    </div>
+
+    <div id="adminPanel">
+        <div class="close-admin" onclick="toggleAdmin()">&times;</div>
+        
+        <div id="adminLoginView" class="admin-box">
+            <h2 style="margin-bottom:20px;">Admin Login</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="adminEmail" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="adminPass">
+            </div>
+            <button class="btn-submit" id="btnLogin">Login</button>
+        </div>
+
+        <div id="adminDashView" class="admin-box" style="display:none;">
+            <h2 style="margin-bottom:10px;">Admin Dashboard</h2>
+            <p style="margin-bottom:20px; color:lime; font-size:0.9rem;">Logged in: mybench77@gmail.com</p>
+            <button class="btn-submit" style="background:#333; margin-top:10px;" id="btnLogout">Logout</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item active"><i class="fas fa-home"></i>Home</a>
+        <a href="#orders-view" class="nav-item"><i class="fas fa-history"></i>Orders</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, limit, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3l8cbCMbZ392wW76_JTum-kpmC9DTaLo",
+            authDomain: "dataxpres-95c56.firebaseapp.com",
+            projectId: "dataxpres-95c56",
+            storageBucket: "dataxpres-95c56.firebasestorage.app",
+            messagingSenderId: "85374783618",
+            appId: "1:85374783618:web:a1dfb66c502ec15aaf249b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        let currentUser = null;
+        const ADMIN_EMAIL = "mybench77@gmail.com";
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === ADMIN_EMAIL) {
+                currentUser = user;
+                document.getElementById('adminLoginView').style.display = 'none';
+                document.getElementById('adminDashView').style.display = 'block';
+                document.getElementById('admin-badge').style.display = 'inline';
+                
+                const dashView = document.getElementById('adminDashView');
+                if(!document.getElementById('btn-go-dash')) {
+                    const dashBtn = document.createElement('button');
+                    dashBtn.id = 'btn-go-dash';
+                    dashBtn.className = 'btn-submit';
+                    dashBtn.style.background = '#00d2ff';
+                    dashBtn.style.marginTop = '10px';
+                    dashBtn.innerText = 'OPEN FULL DASHBOARD';
+                    dashBtn.onclick = () => window.location.href = 'admin.html';
+                    dashView.appendChild(dashBtn);
+                }
+            } else {
+                currentUser = null;
+                document.getElementById('adminLoginView').style.display = 'block';
+                document.getElementById('adminDashView').style.display = 'none';
+                document.getElementById('admin-badge').style.display = 'none';
+            }
+        });
+
+        document.getElementById('btnLogin').addEventListener('click', () => {
+            const email = document.getElementById('adminEmail').value;
+            const pass = document.getElementById('adminPass').value;
+            signInWithEmailAndPassword(auth, email, pass)
+                .then(() => window.location.reload())
+                .catch(e => alert("Error: " + e.message));
+        });
+
+        document.getElementById('btnLogout').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.reload());
+        });
+
+        const q = query(collection(db, "orders"), orderBy("timestamp", "desc"), limit(3));
+        
+        onSnapshot(q, (snapshot) => {
+            const container = document.getElementById('transactionFeed');
+            container.innerHTML = "";
+            
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const id = docSnap.id;
+                const statusClass = data.status === 'Completed' ? 'status-completed' : 'status-pending';
+                
+                // Set correct logo URL based on ImgBB links
+                let logoUrl = "https://i.ibb.co/27Q5C3v1/New-mtn-logo.jpg";
+                if(data.network === 'Telecel') logoUrl = "https://i.ibb.co/wN8Nmqcx/images.png";
+                if(data.network === 'AT') logoUrl = "https://i.ibb.co/mCCL0s4n/Airtel-logo-01.png";
+
+                // PRIVACY MASKING
+                const phone = data.phone || "";
+                const maskedPhone = phone.length >= 10 
+                    ? phone.substring(0, 3) + "****" + phone.slice(-3) 
+                    : phone;
+
+                let adminButtons = "";
+                if (currentUser) {
+                    adminButtons = `
+                        <div class="admin-controls">
+                            <button class="admin-btn btn-p" onclick="updateStatus('${id}', 'Pending')">Set Pending</button>
+                            <button class="admin-btn btn-c" onclick="updateStatus('${id}', 'Completed')">Set Success</button>
+                            <button class="admin-btn btn-d" onclick="removeOrder('${id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="transaction-item">
+                        <div class="t-row">
+                            <img src="${logoUrl}" class="t-logo">
+                            <div class="t-details">
+                                <div class="t-number">${maskedPhone} <span class="t-status-label ${statusClass}">${data.status}</span></div>
+                                <div style="font-size:0.7rem; color:gray;">Mobile Money</div>
+                            </div>
+                            <div class="t-gb">${data.amount}</div>
+                        </div>
+                        ${adminButtons}
+                    </div>
+                `;
+            });
+        });
+
+        window.updateStatus = async (id, newStatus) => {
+            if (!currentUser) return;
+            await updateDoc(doc(db, "orders", id), { status: newStatus });
+        };
+
+        window.removeOrder = async (id) => {
+            if (!currentUser) return;
+            if (confirm("Delete this transaction?")) {
+                await deleteDoc(doc(db, "orders", id));
+            }
+        };
+
+        window.toggleAdmin = () => {
+            const panel = document.getElementById('adminPanel');
+            panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+        };
+    </script>
+</body>
+</html>

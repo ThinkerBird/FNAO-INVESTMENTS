@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - FNAO INVESTMENTS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #030b17;
+            --card-bg: #0d1b2e;
+            --accent-orange: #ff6b35;
+            --text-white: #ffffff;
+            --text-gray: #8b9bb4;
+            --border-color: #1c3652;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-white); min-height: 100vh; }
+
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--border-color); background: var(--bg-color); position: sticky; top: 0; z-index: 100; }
+        .header h1 { font-size: 1.2rem; }
+        .back-home { color: var(--text-gray); text-decoration: none; font-size: 0.9rem; }
+
+        /* Tabs */
+        .tabs { display: flex; padding: 15px 20px; gap: 10px; border-bottom: 1px solid var(--border-color); }
+        .tab-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; background: transparent; color: var(--text-gray); font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .tab-btn.active { background: var(--accent-orange); color: white; }
+
+        /* Content Sections */
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Forms */
+        .admin-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+        .admin-card h3 { margin-bottom: 15px; font-size: 1rem; color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; }
+        .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.8rem; color: var(--text-gray); margin-bottom: 5px; }
+        input, select { width: 100%; padding: 12px; background: #050a14; border: 1px solid var(--border-color); border-radius: 8px; color: white; outline: none; }
+        .btn-add { width: 100%; background: var(--accent-orange); color: white; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        /* List Items (Orders & Plans) */
+        .item { background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; } }
+        
+        .item-info { flex: 1; }
+        .actions { display: flex; gap: 8px; }
+        .btn-icon { width: 35px; height: 35px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-del { background: rgba(230, 0, 0, 0.1); color: #e60000; }
+
+        .empty-msg { text-align: center; padding: 40px; color: var(--text-gray); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Admin Dashboard</h1>
+        <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Home</a>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('orders')">Orders</button>
+        <button class="tab-btn" onclick="showTab('plans')">Manage Plans</button>
+    </div>
+
+    <div class="container">
+        
+        <div id="section-orders" class="section active">
+            <div id="orders-list">
+                <div class="empty-msg">Loading orders...</div>
+            </div>
+        </div>
+
+        <div id="section-plans" class="section">
+            <div class="admin-card">
+                <h3>Add New Data Plan</h3>
+                <div class="grid-form">
+                    <div class="form-group">
+                        <label>Network</label>
+                        <select id="plan-network">
+                            <option value="MTN">MTN</option>
+                            <option value="Telecel">Telecel</option>
+                            <option value="AT">AT</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Data Amount</label>
+                        <input type="text" id="plan-amount" placeholder="e.g. 5GB">
+                    </div>
+                </div>
+                <div class="grid-form">
+                    <div class="form-group">
+                        <label>Price (GHc)</label>
+                        <input type="number" id="plan-price" placeholder="5">
+                    </div>
+                    <div class="form-group">
+                        <label>Description/Meta</label>
+                        <input type="text" id="plan-meta" placeholder="e.g. No Expiry">
+                    </div>
+                </div>
+                <button class="btn-add" id="btnAddPlan">Add Plan</button>
+            </div>
+
+            <h3 style="margin: 20px 0 10px; font-size: 0.9rem; color: var(--text-gray);">EXISTING PLANS</h3>
+            <div id="plans-list">
+                <div class="empty-msg">Fetching your plans...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3l8cbCMbZ392wW76_JTum-kpmC9DTaLo",
+            authDomain: "dataxpres-95c56.firebaseapp.com",
+            projectId: "dataxpres-95c56",
+            storageBucket: "dataxpres-95c56.firebasestorage.app",
+            messagingSenderId: "85374783618",
+            appId: "1:85374783618:web:a1dfb66c502ec15aaf249b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // --- PROTECT PAGE ---
+        onAuthStateChanged(auth, (user) => {
+            if (!user || user.email !== "mybench77@gmail.com") {
+                window.location.href = "index.html"; // Redirect if not admin
+            }
+        });
+
+        // --- TAB LOGIC ---
+        window.showTab = (tab) => {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`section-${tab}`).classList.add('active');
+            event.target.classList.add('active');
+        };
+
+        // --- MANAGE ORDERS (LATEST UPDATE) ---
+        const ordersList = document.getElementById('orders-list');
+        const qOrders = query(collection(db, "orders"), orderBy("timestamp", "desc"), limit(50));
+
+        onSnapshot(qOrders, (snap) => {
+            ordersList.innerHTML = snap.empty ? '<div class="empty-msg">No orders yet.</div>' : '';
+            snap.forEach(d => {
+                const o = d.data();
+                const isDone = o.status === 'Completed';
+                const statusColor = isDone ? '#00c853' : '#ff6b35';
+                
+                let dateStr = "Just now";
+                if(o.timestamp && o.timestamp.toDate) {
+                    dateStr = o.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                }
+
+                const item = document.createElement('div');
+                item.className = 'item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            ${o.phone} 
+                            <span style="font-size:0.7rem; background:${statusColor}33; color:${statusColor}; padding:2px 6px; border-radius:4px; font-weight:bold;">
+                                ${o.status}
+                            </span>
+                        </div>
+                        <span style="color:white; font-size:0.9rem;">${o.network} • <b style="color:#00d2ff">${o.amount}</b> • GHc ${o.price}</span>
+                        <span style="display:block; font-size:0.75rem; color:gray; margin-top:4px;">
+                            ${dateStr} • ${o.paymentMethod || 'Manual'}
+                        </span>
+                    </div>
+                    <div class="actions">
+                        ${!isDone ? 
+                            `<button class="btn-icon" style="color:#00c853; border:1px solid #00c85333; background:#00c85311;" onclick="updateOrderStatus('${d.id}', 'Completed')">
+                                <i class="fas fa-check"></i>
+                            </button>` : 
+                            `<button class="btn-icon" style="color:orange; border:1px solid #ffa50033; background:#ffa50011;" onclick="updateOrderStatus('${d.id}', 'Pending')">
+                                <i class="fas fa-undo"></i>
+                            </button>`
+                        }
+                        <button class="btn-icon btn-del" onclick="deleteItem('orders', '${d.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                ordersList.appendChild(item);
+            });
+        });
+
+        window.updateOrderStatus = async (id, newStatus) => {
+            await updateDoc(doc(db, "orders", id), { status: newStatus });
+        };
+
+        // --- MANAGE PLANS ---
+        const plansList = document.getElementById('plans-list');
+        const qPlans = query(collection(db, "plans"), orderBy("network", "asc"));
+
+        onSnapshot(qPlans, (snap) => {
+            plansList.innerHTML = snap.empty ? '<div class="empty-msg">No plans added yet.</div>' : '';
+            snap.forEach(d => {
+                const p = d.data();
+                const item = document.createElement('div');
+                item.className = 'item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <div style="font-weight:bold;">${p.network} - ${p.gb}</div>
+                        <div style="font-size:0.8rem; color:var(--text-gray);">GHc ${p.price} • ${p.meta}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-icon btn-del" onclick="deleteItem('plans', '${d.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                plansList.appendChild(item);
+            });
+        });
+
+        document.getElementById('btnAddPlan').addEventListener('click', async () => {
+            const network = document.getElementById('plan-network').value;
+            const gb = document.getElementById('plan-amount').value;
+            const price = document.getElementById('plan-price').value;
+            const meta = document.getElementById('plan-meta').value;
+
+            if(!gb || !price) return alert("Please fill all fields");
+
+            try {
+                await addDoc(collection(db, "plans"), { network, gb, price, meta });
+                alert("Plan added!");
+                document.getElementById('plan-amount').value = '';
+                document.getElementById('plan-price').value = '';
+                document.getElementById('plan-meta').value = '';
+            } catch (e) { alert("Error: " + e.message); }
+        });
+
+        // Universal Delete
+        window.deleteItem = async (coll, id) => {
+            if(confirm("Are you sure you want to delete this?")) {
+                await deleteDoc(doc(db, coll, id));
+            }
+        };
+
+    </script>
+</body>
+</html>

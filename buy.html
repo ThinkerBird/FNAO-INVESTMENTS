@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Data - FNAO INVESTMENTS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <style>
+        :root {
+            --bg-color: #030b17;
+            --card-bg: #0d1b2e;
+            --accent-orange: #ff6b35;
+            --text-white: #ffffff;
+            --text-gray: #8b9bb4;
+            --mtn-yellow: #ffcc00;
+            --telecel-red: #e60000;
+            --at-blue: #0000ff;
+            --success-green: #00c853;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-white); min-height: 100vh; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #1c3652; }
+        .logo { font-size: 1.4rem; font-weight: 800; cursor: pointer; }
+        .logo span { color: #00d2ff; }
+
+        /* Stepper */
+        .stepper { display: flex; justify-content: space-between; padding: 20px; max-width: 500px; margin: 0 auto; }
+        .step { display: flex; flex-direction: column; align-items: center; position: relative; flex: 1; }
+        .step-circle { width: 35px; height: 35px; border-radius: 50%; background: #1c3652; color: var(--text-gray); display: flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 5px; z-index: 2; transition: all 0.3s; }
+        .step.active .step-circle { background: #00d2ff; color: #000; }
+        .step.completed .step-circle { background: #00c853; color: white; }
+        .step-label { font-size: 0.7rem; color: var(--text-gray); text-transform: uppercase; }
+        .step::after { content: ''; position: absolute; top: 17px; left: 50%; width: 100%; height: 2px; background: #1c3652; z-index: 1; }
+        .step:last-child::after { display: none; }
+        .step.active::after, .step.completed::after { background: #00d2ff; }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        .screen { display: none; animation: fadeIn 0.4s; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { margin-bottom: 20px; font-size: 1.3rem; }
+        
+        .grid-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .option-card { background: var(--card-bg); border: 1px solid #1c3652; border-radius: 15px; padding: 30px 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .option-card:hover { border-color: var(--accent-orange); }
+        .net-circle { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold; font-size: 1.5rem; color: #333; }
+        .mtn { background: var(--mtn-yellow); }
+        .telecel { background: var(--telecel-red); color: white; }
+        .at { background: var(--at-blue); color: white; }
+
+        .plan-item { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border: 1px solid #1c3652; padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; }
+        .plan-item:hover { border-color: var(--accent-orange); }
+        .plan-price { color: var(--accent-orange); font-weight: bold; }
+        .plan-meta { font-size: 0.8rem; color: var(--text-gray); margin-top: 2px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; color: var(--text-gray); font-size: 0.9rem; }
+        .form-input { width: 100%; padding: 15px; background: #050a14; border: 1px solid #1c3652; border-radius: 10px; color: white; font-size: 1rem; outline: none; }
+        .form-input:focus { border-color: var(--accent-orange); }
+
+        .pay-method { display: flex; align-items: center; padding: 15px; border: 1px solid #1c3652; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; }
+        .pay-method.selected { border-color: var(--accent-orange); background: rgba(255, 107, 53, 0.1); }
+        .pay-radio { margin-right: 15px; accent-color: var(--accent-orange); }
+        
+        .manual-pay-box { border: 1px solid var(--mtn-yellow); background: rgba(255, 204, 0, 0.05); padding: 15px; border-radius: 12px; margin-top: 10px; font-size: 0.9rem; display: block; }
+        .manual-details { margin-top: 10px; line-height: 1.6; color: #ddd; }
+        .manual-highlight { color: white; font-weight: bold; }
+
+        .btn-action { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+        .btn-primary { background: #00d2ff; color: #030b17; }
+        .btn-success { background: var(--success-green); color: white; }
+        .btn-outline { background: transparent; border: 1px solid #1c3652; color: white; margin-top: 15px; }
+        
+        .success-icon { width: 80px; height: 80px; background: rgba(0, 200, 83, 0.2); color: var(--success-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px; }
+        .text-center { text-align: center; }
+
+        .loader { display: none; margin: 20px auto; border: 4px solid #f3f3f3; border-top: 4px solid var(--accent-orange); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo" onclick="window.location.href='index.html'">FNAO <span>INVESTMENTS</span></div>
+        <i class="fas fa-bars" style="color:white; font-size:1.2rem;"></i>
+    </div>
+
+    <div class="stepper">
+        <div class="step active" id="step1-ind"><div class="step-circle">1</div><span class="step-label">Network</span></div>
+        <div class="step" id="step2-ind"><div class="step-circle">2</div><span class="step-label">Plan</span></div>
+        <div class="step" id="step3-ind"><div class="step-circle">3</div><span class="step-label">Details</span></div>
+        <div class="step" id="step4-ind"><div class="step-circle">4</div><span class="step-label">Pay</span></div>
+        <div class="step" id="step5-ind"><div class="step-circle">5</div><span class="step-label">Done</span></div>
+    </div>
+
+    <div class="container">
+        
+        <div id="screen-network" class="screen active">
+            <h2>Select Network</h2>
+            <div class="grid-options">
+                <div class="option-card" onclick="selectNetwork('MTN')">
+                    <div class="net-circle mtn">M</div>
+                    <div>MTN</div>
+                </div>
+                <div class="option-card" onclick="selectNetwork('Telecel')">
+                    <div class="net-circle telecel">T</div>
+                    <div>Telecel</div>
+                </div>
+                <div class="option-card" onclick="selectNetwork('AT')">
+                    <div class="net-circle at">A</div>
+                    <div>AT</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-plan" class="screen">
+            <h2 id="plan-title">Select Plan</h2>
+            <div id="plans-container">
+                <p style="text-align:center; color:gray; padding:20px;">Fetching plans...</p>
+            </div>
+            <button class="btn-action btn-outline" onclick="goToStep(1)">Back</button>
+        </div>
+
+        <div id="screen-details" class="screen">
+            <h2>Enter Details</h2>
+            <div class="form-group">
+                <label class="form-label">Phone Number (Recipient)</label>
+                <input type="tel" id="input-phone" class="form-input" placeholder="0541234567">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email (For Receipt)</label>
+                <input type="email" id="input-email" class="form-input" placeholder="you@example.com">
+            </div>
+            
+            <div style="background:#0d1b2e; padding:15px; border-radius:10px; border:1px solid #1c3652;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span style="color:#8b9bb4;">Selected Plan:</span>
+                    <span id="summary-plan" style="font-weight:bold;">Loading...</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:1.2rem;">
+                    <span>Total:</span>
+                    <span id="summary-price" style="color:var(--accent-orange); font-weight:bold;">GHc 0</span>
+                </div>
+            </div>
+
+            <button class="btn-action btn-primary" onclick="goToStep(4)">Proceed to Payment</button>
+            <button class="btn-action btn-outline" onclick="goToStep(2)">Back</button>
+        </div>
+
+        <div id="screen-pay" class="screen">
+            <h2>Payment Method</h2>
+            
+            <div class="pay-method selected" id="method-online" onclick="selectPayment('Paystack')">
+                <input type="radio" name="pay" class="pay-radio" checked>
+                <span>Pay Online (Card / MoMo)</span>
+            </div>
+
+            <div class="pay-method" id="method-manual" onclick="selectPayment('Manual Transfer')">
+                <input type="radio" name="pay" class="pay-radio">
+                <span>Manual Mobile Money</span>
+            </div>
+
+            <div id="manual-pay-box" class="manual-pay-box" style="display:none;">
+                <div style="color:var(--mtn-yellow); font-weight:bold; margin-bottom:5px;">
+                    <i class="far fa-circle"></i> Pay manually to:
+                </div>
+                <div class="manual-details">
+                    Number: <span class="manual-highlight">024 123 4567</span><br>
+                    Name: <span class="manual-highlight">FNAO INVESTMENTS</span><br><br>
+                    <span style="color:var(--mtn-yellow); font-size:0.8rem;">Click the button below AFTER you send the money.</span>
+                </div>
+            </div>
+
+            <button id="btn-submit-order" class="btn-action btn-success">Pay <span id="btn-pay-amount"></span></button>
+            <div class="loader" id="loader"></div>
+            <button class="btn-action btn-outline" onclick="goToStep(3)">Back</button>
+        </div>
+
+        <div id="screen-success" class="screen text-center">
+            <div style="height:50px;"></div>
+            <div class="success-icon"><i class="fas fa-check"></i></div>
+            <h2 id="success-title">Order Received!</h2>
+            <p style="color:var(--text-gray); line-height:1.6; margin-bottom:30px;">
+                Your order for <span id="final-gb" style="color:#00d2ff">...</span> on <span id="final-net" style="color:white; font-weight:bold;">...</span> is being processed. 
+            </p>
+            <button class="btn-action btn-primary" onclick="window.location.reload()">Buy More Data</button>
+            <button class="btn-action btn-outline" onclick="window.location.href='index.html'">Return Home</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3l8cbCMbZ392wW76_JTum-kpmC9DTaLo",
+            authDomain: "dataxpres-95c56.firebaseapp.com",
+            projectId: "dataxpres-95c56",
+            storageBucket: "dataxpres-95c56.firebasestorage.app",
+            messagingSenderId: "85374783618",
+            appId: "1:85374783618:web:a1dfb66c502ec15aaf249b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let orderData = {
+            network: '',
+            amount: '', 
+            price: '',
+            phone: '',
+            email: '',
+            paymentMethod: 'Paystack'
+        };
+
+        window.selectNetwork = (net) => {
+            orderData.network = net;
+            renderPlans(net);
+            goToStep(2);
+        };
+
+        function renderPlans(network) {
+            const container = document.getElementById('plans-container');
+            const title = document.getElementById('plan-title');
+            title.innerText = `Select ${network} Plan`;
+            container.innerHTML = '<p style="text-align:center; padding:20px; color:gray;">Loading plans...</p>';
+
+            const q = query(collection(db, "plans"), where("network", "==", network));
+            
+            onSnapshot(q, (snapshot) => {
+                container.innerHTML = '';
+                snapshot.forEach(docSnap => {
+                    const plan = docSnap.data();
+                    const div = document.createElement('div');
+                    div.className = 'plan-item';
+                    div.innerHTML = `
+                        <div>
+                            <div style="font-size:1.2rem; font-weight:bold;">${plan.gb}</div>
+                            <div class="plan-meta">${plan.meta || 'No Expiry'}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="plan-price">GHc ${plan.price}</div>
+                        </div>
+                    `;
+                    div.onclick = () => selectPlan(plan);
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        window.selectPlan = (plan) => {
+            orderData.amount = plan.gb;
+            orderData.price = plan.price;
+            document.getElementById('summary-plan').innerText = `${plan.gb} - ${orderData.network}`;
+            document.getElementById('summary-price').innerText = `GHc ${plan.price}`;
+            document.getElementById('btn-pay-amount').innerText = `GHc ${plan.price}`;
+            goToStep(3);
+        };
+
+        window.goToStep = (stepNum) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.step').forEach((s, i) => {
+                if(i + 1 < stepNum) s.className = 'step completed';
+                else if (i + 1 === stepNum) s.className = 'step active';
+                else s.className = 'step';
+            });
+            const screens = ['network', 'plan', 'details', 'pay', 'success'];
+            document.getElementById(`screen-${screens[stepNum-1]}`).classList.add('active');
+        };
+
+        window.selectPayment = (method) => {
+            orderData.paymentMethod = method;
+            document.getElementById('method-online').classList.toggle('selected', method === 'Paystack');
+            document.getElementById('method-manual').classList.toggle('selected', method !== 'Paystack');
+            document.getElementById('manual-pay-box').style.display = method === 'Paystack' ? 'none' : 'block';
+            document.getElementById('btn-submit-order').innerText = method === 'Paystack' ? `Pay GHc ${orderData.price}` : "I've Sent the Money";
+        };
+
+        document.getElementById('btn-submit-order').addEventListener('click', async () => {
+            orderData.phone = document.getElementById('input-phone').value;
+            orderData.email = document.getElementById('input-email').value;
+
+            if(!orderData.phone || orderData.phone.length < 10) return alert("Enter valid phone number");
+
+            if(orderData.paymentMethod === 'Paystack') {
+                if(!orderData.email) return alert("Email required for online pay");
+                
+                const handler = PaystackPop.setup({
+                    key: 'Pk_live_a1d03bb848d6a5d8d78b21112db6602ffddcbac8',
+                    email: orderData.email,
+                    amount: orderData.price * 100,
+                    currency: 'GHS',
+                    callback: (res) => submitToFirebase("Paid", res.reference),
+                    onClose: () => alert('Window closed.')
+                });
+                handler.openIframe();
+            } else {
+                submitToFirebase("Pending-Manual", "MANUAL");
+            }
+        });
+
+        async function submitToFirebase(status, ref) {
+            document.getElementById('btn-submit-order').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+            try {
+                await addDoc(collection(db, "orders"), {
+                    ...orderData,
+                    status: status,
+                    reference: ref,
+                    timestamp: new Date()
+                });
+                document.getElementById('final-gb').innerText = orderData.amount;
+                document.getElementById('final-net').innerText = orderData.network;
+                goToStep(5);
+            } catch (e) {
+                alert("Error saving order.");
+                document.getElementById('btn-submit-order').style.display = 'block';
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
