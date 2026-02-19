@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buy Data - FNAO INVESTMENTS</title>
+    <title>Buy Data - FNAO DATA BUNDLE GH</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://js.paystack.co/v1/inline.js"></script>
     <style>
         :root {
@@ -17,14 +18,44 @@
             --telecel-red: #e60000;
             --at-blue: #0000ff;
             --success-green: #00c853;
+            --gradient: linear-gradient(90deg, #ff7e21, #f9a825); /* Added for improved logo */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-white); min-height: 100vh; }
 
         .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #1c3652; }
-        .logo { font-size: 1.4rem; font-weight: 800; cursor: pointer; }
-        .logo span { color: #00d2ff; }
+        
+        /* Improved Logo Styling */
+        .logo { 
+            font-family: 'Inter', sans-serif;
+            font-size: 1.4rem; 
+            font-weight: 900; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+        .logo-icon {
+            background: var(--gradient);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(255, 126, 33, 0.4);
+        }
+        .logo span { 
+            color: #00d2ff; 
+            font-weight: 400;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
 
         /* Stepper */
         .stepper { display: flex; justify-content: space-between; padding: 20px; max-width: 500px; margin: 0 auto; }
@@ -82,7 +113,10 @@
 <body>
 
     <div class="header">
-        <div class="logo" onclick="window.location.href='index.html'">FNAO <span>INVESTMENTS</span></div>
+        <div class="logo" onclick="window.location.href='index.html'">
+            <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+            FNAO <span>DATA BUNDLE GH</span>
+        </div>
         <i class="fas fa-bars" style="color:white; font-size:1.2rem;"></i>
     </div>
 
@@ -167,7 +201,7 @@
                 </div>
                 <div class="manual-details">
                     Number: <span class="manual-highlight">0248931248</span><br>
-                    Name: <span class="manual-highlight">FNAO INVESTMENTS</span><br><br>
+                    Name: <span class="manual-highlight">FNAO DATA BUNDLE GH</span><br><br>
                     <span style="color:var(--mtn-yellow); font-size:0.8rem;">Click the button below AFTER you send the money.</span>
                 </div>
             </div>
