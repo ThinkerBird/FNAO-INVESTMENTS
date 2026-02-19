@@ -45,12 +45,9 @@
         h2 { margin-bottom: 20px; font-size: 1.3rem; }
         
         .grid-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .option-card { background: var(--card-bg); border: 1px solid #1c3652; border-radius: 15px; padding: 30px 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .option-card { background: var(--card-bg); border: 1px solid #1c3652; border-radius: 15px; padding: 20px 10px; text-align: center; cursor: pointer; transition: 0.2s; }
         .option-card:hover { border-color: var(--accent-orange); }
-        .net-circle { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-weight: bold; font-size: 1.5rem; color: #333; }
-        .mtn { background: var(--mtn-yellow); }
-        .telecel { background: var(--telecel-red); color: white; }
-        .at { background: var(--at-blue); color: white; }
+        .net-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; background: white; border: 2px solid #1c3652; }
 
         .plan-item { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border: 1px solid #1c3652; padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; }
         .plan-item:hover { border-color: var(--accent-orange); }
@@ -103,15 +100,15 @@
             <h2>Select Network</h2>
             <div class="grid-options">
                 <div class="option-card" onclick="selectNetwork('MTN')">
-                    <div class="net-circle mtn">M</div>
+                    <img src="https://i.ibb.co/27Q5C3v1/New-mtn-logo.jpg" class="net-logo" alt="MTN">
                     <div>MTN</div>
                 </div>
                 <div class="option-card" onclick="selectNetwork('Telecel')">
-                    <div class="net-circle telecel">T</div>
+                    <img src="https://i.ibb.co/wN8Nmqcx/images.png" class="net-logo" alt="Telecel">
                     <div>Telecel</div>
                 </div>
                 <div class="option-card" onclick="selectNetwork('AT')">
-                    <div class="net-circle at">A</div>
+                    <img src="https://i.ibb.co/mCCL0s4n/Airtel-logo-01.png" class="net-logo" alt="AT">
                     <div>AT</div>
                 </div>
             </div>
