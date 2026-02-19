@@ -30,10 +30,13 @@
         .hero { background: var(--gradient); margin: 15px; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(255, 126, 33, 0.3); }
         .hero h2 { margin-bottom: 10px; font-size: 1.5rem; }
         .hero p { font-size: 0.9rem; margin-bottom: 20px; opacity: 0.9; }
-        .hero-btns { display: flex; gap: 10px; }
-        .btn { border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; flex: 1; text-align: center; }
+        .hero-btns { display: flex; flex-direction: column; gap: 10px; }
+        .main-btns { display: flex; gap: 10px; }
+        .support-btns { display: flex; gap: 10px; }
+        .btn { border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; flex: 1; text-align: center; text-decoration: none; display: inline-block; }
         .btn-white { background: white; color: var(--accent-orange); }
-        .btn-outline { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); }
+        .btn-outline { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); font-size: 0.85rem; }
+        .btn-outline i { margin-right: 5px; }
 
         /* Networks */
         .section-title { margin: 20px 15px 15px; font-size: 1.1rem; font-weight: 700; }
@@ -88,8 +91,16 @@
         <h2>Akwaaba, Chief! 👋</h2>
         <p>Your instant data plug. 24/7 reliability.</p>
         <div class="hero-btns">
-            <button class="btn btn-white" onclick="window.location.href='buy.html'">Buy Data</button>
-            <button class="btn btn-outline">Support</button>
+            <button class="btn btn-white" onclick="window.location.href='buy.html'">Buy Data Now</button>
+            
+            <div class="support-btns">
+                <a href="https://wa.me/233509553089?text=Hello%20FNAO%20Investments%2C%20I%20need%20help%20with%20my%20data%20order." class="btn btn-outline">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+                <a href="tel:+233509553089" class="btn btn-outline">
+                    <i class="fas fa-phone-alt"></i> Call Us
+                </a>
+            </div>
         </div>
     </div>
 
@@ -212,12 +223,10 @@
                 const id = docSnap.id;
                 const statusClass = data.status === 'Completed' ? 'status-completed' : 'status-pending';
                 
-                // Set correct logo URL based on ImgBB links
                 let logoUrl = "https://i.ibb.co/27Q5C3v1/New-mtn-logo.jpg";
                 if(data.network === 'Telecel') logoUrl = "https://i.ibb.co/wN8Nmqcx/images.png";
                 if(data.network === 'AT') logoUrl = "https://i.ibb.co/mCCL0s4n/Airtel-logo-01.png";
 
-                // PRIVACY MASKING
                 const phone = data.phone || "";
                 const maskedPhone = phone.length >= 10 
                     ? phone.substring(0, 3) + "****" + phone.slice(-3) 
