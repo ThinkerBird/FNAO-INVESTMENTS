@@ -62,11 +62,12 @@
         .hero p { font-size: 0.9rem; margin-bottom: 20px; opacity: 0.9; }
         .hero-btns { display: flex; flex-direction: column; gap: 10px; }
         .main-btns { display: flex; gap: 10px; }
-        .support-btns { display: flex; gap: 10px; }
+        .support-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn { border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer; flex: 1; text-align: center; text-decoration: none; display: inline-block; }
-        .btn-white { background: white; color: var(--accent-orange); }
+        .btn-white { background: white; color: var(--accent-orange); width: 100%; }
         .btn-outline { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); font-size: 0.85rem; }
         .btn-outline i { margin-right: 5px; }
+        .btn-channel { grid-column: span 2; background: #25d366; color: white; }
 
         /* Networks */
         .section-title { margin: 20px 15px 15px; font-size: 1.1rem; font-weight: 700; }
@@ -132,6 +133,9 @@
                 </a>
                 <a href="tel:+233248931248" class="btn btn-outline">
                     <i class="fas fa-phone-alt"></i> Call Us
+                </a>
+                <a href="https://whatsapp.com/channel/0029VaiHkLcJP217k2dl5w3x" class="btn btn-channel">
+                    <i class="fas fa-bullhorn"></i> Join Our WhatsApp Channel
                 </a>
             </div>
         </div>
