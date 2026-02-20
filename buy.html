@@ -94,10 +94,6 @@
         .pay-method.selected { border-color: var(--accent-orange); background: rgba(255, 107, 53, 0.1); }
         .pay-radio { margin-right: 15px; accent-color: var(--accent-orange); }
         
-        .manual-pay-box { border: 1px solid var(--mtn-yellow); background: rgba(255, 204, 0, 0.05); padding: 15px; border-radius: 12px; margin-top: 10px; font-size: 0.9rem; display: block; }
-        .manual-details { margin-top: 10px; line-height: 1.6; color: #ddd; }
-        .manual-highlight { color: white; font-weight: bold; }
-
         .btn-action { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
         .btn-primary { background: #00d2ff; color: #030b17; }
         .btn-success { background: var(--success-green); color: white; }
@@ -185,25 +181,9 @@
         <div id="screen-pay" class="screen">
             <h2>Payment Method</h2>
             
-            <div class="pay-method selected" id="method-online" onclick="selectPayment('Paystack')">
+            <div class="pay-method selected">
                 <input type="radio" name="pay" class="pay-radio" checked>
                 <span>Pay Online (Card / MoMo)</span>
-            </div>
-
-            <div class="pay-method" id="method-manual" onclick="selectPayment('Manual Transfer')">
-                <input type="radio" name="pay" class="pay-radio">
-                <span>Manual Mobile Money</span>
-            </div>
-
-            <div id="manual-pay-box" class="manual-pay-box" style="display:none;">
-                <div style="color:var(--mtn-yellow); font-weight:bold; margin-bottom:5px;">
-                    <i class="far fa-circle"></i> Pay manually to:
-                </div>
-                <div class="manual-details">
-                    Number: <span class="manual-highlight">0248931248</span><br>
-                    Name: <span class="manual-highlight">FNAO DATA BUNDLE GH</span><br><br>
-                    <span style="color:var(--mtn-yellow); font-size:0.8rem;">Click the button below AFTER you send the money.</span>
-                </div>
             </div>
 
             <button id="btn-submit-order" class="btn-action btn-success">Pay <span id="btn-pay-amount"></span></button>
@@ -263,9 +243,21 @@
             const q = query(collection(db, "plans"), where("network", "==", network));
             
             onSnapshot(q, (snapshot) => {
-                container.innerHTML = '';
+                let plans = [];
                 snapshot.forEach(docSnap => {
-                    const plan = docSnap.data();
+                    plans.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                plans.sort((a, b) => Number(a.price) - Number(b.price));
+
+                container.innerHTML = '';
+                
+                if (plans.length === 0) {
+                    container.innerHTML = '<p style="text-align:center; padding:20px; color:gray;">No plans found for this network.</p>';
+                    return;
+                }
+
+                plans.forEach(plan => {
                     const div = document.createElement('div');
                     div.className = 'plan-item';
                     div.innerHTML = `
@@ -280,6 +272,9 @@
                     div.onclick = () => selectPlan(plan);
                     container.appendChild(div);
                 });
+            }, (error) => {
+                console.error("Firebase Error:", error);
+                container.innerHTML = '<p style="text-align:center; padding:20px; color:red;">Error loading plans. Check console.</p>';
             });
         }
 
@@ -303,35 +298,22 @@
             document.getElementById(`screen-${screens[stepNum-1]}`).classList.add('active');
         };
 
-        window.selectPayment = (method) => {
-            orderData.paymentMethod = method;
-            document.getElementById('method-online').classList.toggle('selected', method === 'Paystack');
-            document.getElementById('method-manual').classList.toggle('selected', method !== 'Paystack');
-            document.getElementById('manual-pay-box').style.display = method === 'Paystack' ? 'none' : 'block';
-            document.getElementById('btn-submit-order').innerText = method === 'Paystack' ? `Pay GHc ${orderData.price}` : "I've Sent the Money";
-        };
-
         document.getElementById('btn-submit-order').addEventListener('click', async () => {
             orderData.phone = document.getElementById('input-phone').value;
             orderData.email = document.getElementById('input-email').value;
 
             if(!orderData.phone || orderData.phone.length < 10) return alert("Enter valid phone number");
-
-            if(orderData.paymentMethod === 'Paystack') {
-                if(!orderData.email) return alert("Email required for online pay");
-                
-                const handler = PaystackPop.setup({
-                    key: 'Pk_live_a1d03bb848d6a5d8d78b21112db6602ffddcbac8',
-                    email: orderData.email,
-                    amount: orderData.price * 100,
-                    currency: 'GHS',
-                    callback: (res) => submitToFirebase("Paid", res.reference),
-                    onClose: () => alert('Window closed.')
-                });
-                handler.openIframe();
-            } else {
-                submitToFirebase("Pending-Manual", "MANUAL");
-            }
+            if(!orderData.email) return alert("Email required for online pay");
+            
+            const handler = PaystackPop.setup({
+                key: 'Pk_live_a1d03bb848d6a5d8d78b21112db6602ffddcbac8',
+                email: orderData.email,
+                amount: orderData.price * 100,
+                currency: 'GHS',
+                callback: (res) => submitToFirebase("Paid", res.reference),
+                onClose: () => alert('Window closed.')
+            });
+            handler.openIframe();
         });
 
         async function submitToFirebase(status, ref) {
